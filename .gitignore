@@ -31,3 +31,21 @@ build/
 
 ### VS Code ###
 .vscode/
+# Angular specific
+.angular/
+.angular-cache/
+coverage/
+dist/
+tmp/
+out-tsc/
+node_modules/
+
+# Angular build artifacts
+*.ngfactory.ts
+*.ngsummary.json
+*.ngstyle.ts
+*.ngtypecheck.ts
+*.ngtsc.json
+
+# Environment files
+src/environments/environment.*.ts

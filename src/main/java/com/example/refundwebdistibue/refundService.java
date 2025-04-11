@@ -1,8 +1,10 @@
 package com.example.refundwebdistibue;
 
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,4 +43,82 @@ public class refundService {
             return "Refund not deleted";
         }
     }
+    
+
+
+    public byte[] generateRefundPdf() throws Exception {
+        List<refund> refunds = refundRepository.findAll();
+
+        StringBuilder html = new StringBuilder();
+        html.append("<html><head><style>")
+                .append("table { width: 100%; border-collapse: collapse; }")
+                .append("th, td { border: 1px solid black; padding: 8px; }")
+                .append("</style></head><body>")
+                .append("<h2>Liste des remboursements</h2>")
+                .append("<table><tr><th>ID</th><th>Montant</th><th>Status</th><th>Date Demande</th><th>Date Traitement</th></tr>");
+
+        for (refund r : refunds) {
+            html.append("<tr>")
+                    .append("<td>").append(r.getId()).append("</td>")
+                    .append("<td>").append(r.getAmount()).append("</td>")
+                    .append("<td>").append(r.getStatus()).append("</td>")
+                    .append("<td>").append(r.getRequestDate()).append("</td>")
+                    .append("<td>").append(r.getProcessedDate() != null ? r.getProcessedDate() : "").append("</td>")
+                    .append("</tr>");
+        }
+
+        html.append("</table></body></html>");
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        PdfRendererBuilder builder = new PdfRendererBuilder();
+        builder.withHtmlContent(html.toString(), null);
+        builder.toStream(out);
+        builder.run();
+
+        return out.toByteArray();
+    }
+    public byte[] generateRefundPdfByStatus(String status) throws Exception {
+        List<refund> refunds;
+
+        if (status != null && !status.isEmpty()) {
+            refunds = refundRepository.findAll().stream()
+                    .filter(r -> r.getStatus().equalsIgnoreCase(status))
+                    .toList();
+        } else {
+            refunds = refundRepository.findAll();
+        }
+
+        StringBuilder html = new StringBuilder();
+        html.append("<html><head><style>")
+                .append("table { width: 100%; border-collapse: collapse; }")
+                .append("th, td { border: 1px solid black; padding: 8px; }")
+                .append("</style></head><body>")
+                .append("<h2>Remboursements")
+                .append(status != null ? " - Statut: " + status.toUpperCase() : "")
+                .append("</h2>")
+                .append("<table><tr><th>ID</th><th>Montant</th><th>Statut</th><th>Date Demande</th><th>Date Traitement</th></tr>");
+
+        for (refund r : refunds) {
+            html.append("<tr>")
+                    .append("<td>").append(r.getId()).append("</td>")
+                    .append("<td>").append(r.getAmount()).append("</td>")
+                    .append("<td>").append(r.getStatus()).append("</td>")
+                    .append("<td>").append(r.getRequestDate()).append("</td>")
+                    .append("<td>").append(r.getProcessedDate() != null ? r.getProcessedDate() : "").append("</td>")
+                    .append("</tr>");
+        }
+
+        html.append("</table></body></html>");
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        PdfRendererBuilder builder = new PdfRendererBuilder();
+        builder.withHtmlContent(html.toString(), null);
+        builder.toStream(out);
+        builder.run();
+
+        return out.toByteArray();
+    }
+
+
+
 }
