@@ -12,7 +12,7 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
-    @Bean
+   /* @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
@@ -39,5 +39,5 @@ public class SecurityConfig {
             return List.of(); // no authorities
         });
         return converter;
-    }
+    }*/
 }
